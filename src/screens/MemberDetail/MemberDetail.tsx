@@ -39,6 +39,7 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ id }): JSX.Element => {
     data: data,
     loading: loading,
     error: error,
+    refetch: userDetailsRefetch,
   } = useQuery(USER_DETAILS, {
     variables: { id: location.state?.id ?? id }, // For testing we are sending the id as a prop
   });
@@ -67,10 +68,8 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ id }): JSX.Element => {
 
       /* istanbul ignore next */
       if (data) {
+        userDetailsRefetch();
         toast.success(t('addedAsAdmin'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */

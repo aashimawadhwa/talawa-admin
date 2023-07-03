@@ -1,7 +1,7 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useMutation } from '@apollo/client';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,15 @@ import { Link } from 'react-router-dom';
 import defaultImg from 'assets/third_image.png';
 import { errorHandler } from 'utils/errorHandler';
 
+type usersRefetchFn = (
+  variables?:
+    | Partial<{
+        firstName_contains: string;
+        lastName_contains: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
+
 interface UserListCardProps {
   key: string;
   id: string;
@@ -18,6 +27,7 @@ interface UserListCardProps {
   joinDate: string;
   memberImage: string;
   memberEmail: string;
+  usersRefetch?: usersRefetchFn;
 }
 
 function UserListCard(props: UserListCardProps): JSX.Element {
@@ -38,11 +48,9 @@ function UserListCard(props: UserListCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.usersRefetch) {
+        props.usersRefetch();
         toast.success(t('addedAsAdmin'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './MemberRequestCard.module.css';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useMutation } from '@apollo/client';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import {
   ACCEPT_ORGANIZATION_REQUEST_MUTATION,
   REJECT_ORGANIZATION_REQUEST_MUTATION,
@@ -12,6 +12,14 @@ import { toast } from 'react-toastify';
 import defaultImg from 'assets/third_image.png';
 import { errorHandler } from 'utils/errorHandler';
 
+type membershipRequestRefetchFn = (
+  variables?:
+    | Partial<{
+        id: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
+
 interface MemberRequestCardProps {
   key: string;
   id: string;
@@ -20,6 +28,7 @@ interface MemberRequestCardProps {
   joinDate: string;
   memberImage: string;
   email: string;
+  membershipRequestRefetch?: membershipRequestRefetchFn;
 }
 
 function MemberRequestCard(props: MemberRequestCardProps): JSX.Element {
@@ -39,11 +48,11 @@ function MemberRequestCard(props: MemberRequestCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      toast.success(t('memberAdded'));
-      /* istanbul ignore next */
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      if (props.membershipRequestRefetch) {
+        /* istanbul ignore next */
+        props.membershipRequestRefetch();
+        toast.success(t('memberAdded'));
+      }
     } catch (error: any) {
       /* istanbul ignore next */
       errorHandler(t, error);
@@ -60,8 +69,9 @@ function MemberRequestCard(props: MemberRequestCardProps): JSX.Element {
           },
         });
 
-        /* istanbul ignore next */
-        window.location.reload();
+        if (props.membershipRequestRefetch) {
+          props.membershipRequestRefetch();
+        }
       } catch (error: any) {
         /* istanbul ignore next */
         errorHandler(t, error);

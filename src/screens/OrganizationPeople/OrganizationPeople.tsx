@@ -291,6 +291,7 @@ function OrganizationPeople(): JSX.Element {
                                   datas.firstName + ' ' + datas.lastName
                                 }
                                 memberEmail={datas.email}
+                                membersRefetch={memberRefetch}
                               />
                             );
                           }
@@ -329,6 +330,7 @@ function OrganizationPeople(): JSX.Element {
                                   datas.firstName + ' ' + datas.lastName
                                 }
                                 memberEmail={datas.email}
+                                adminRefetch={adminRefetch}
                               />
                             );
                           }
@@ -365,6 +367,7 @@ function OrganizationPeople(): JSX.Element {
                                   datas.firstName + ' ' + datas.lastName
                                 }
                                 memberEmail={datas.email}
+                                usersRefetch={usersRefetch}
                               />
                             );
                           }

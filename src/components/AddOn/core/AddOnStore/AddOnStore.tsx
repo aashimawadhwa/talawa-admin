@@ -37,7 +37,7 @@ function AddOnStore(): JSX.Element {
   const plugins = useSelector((state: RootState) => state.plugins);
   const { installed, addonStore } = plugins;
   // type plugData = { pluginName: String, plug };
-  const { data, loading, error } = useQuery(PLUGIN_GET);
+  const { data, loading, error, refetch: addOnRefetch } = useQuery(PLUGIN_GET);
   /* istanbul ignore next */
   const getStorePlugins = async () => {
     let plugins = await new PluginHelper().fetchStore();
@@ -166,7 +166,7 @@ function AddOnStore(): JSX.Element {
                 Search results for <b>{searchText}</b>
               </p>
             ) : null}
-            <AddOnRegister />
+            <AddOnRegister addOnRefetch={addOnRefetch} />
             <Tabs
               defaultActiveKey="available"
               id="uncontrolled-tab-example"

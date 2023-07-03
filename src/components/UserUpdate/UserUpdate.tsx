@@ -84,9 +84,6 @@ const UserUpdate: React.FC<UserUpdateProps> = ({ id }): JSX.Element => {
           file: '',
         });
         toast.success('Successful updated');
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
       }
     } catch (error: any) {
       /* istanbul ignore next */

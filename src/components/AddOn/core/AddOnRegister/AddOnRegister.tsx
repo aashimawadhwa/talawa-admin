@@ -6,10 +6,12 @@ import { useMutation } from '@apollo/client';
 import { ADD_PLUGIN_MUTATION } from 'GraphQl/Mutations/mutations';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { OperationVariables } from '@apollo/client';
 
 interface AddOnRegisterProps {
   id?: string; // OrgId
   createdBy?: string; // User
+  addOnRefetch?: (variables?: Partial<OperationVariables> | undefined) => void;
 }
 interface formStateTypes {
   pluginName: string;
@@ -21,7 +23,10 @@ interface formStateTypes {
 
 const currentUrl = window.location.href.split('=')[1];
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function AddOnRegister({ createdBy }: AddOnRegisterProps): JSX.Element {
+function AddOnRegister({
+  createdBy,
+  addOnRefetch,
+}: AddOnRegisterProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'addOnRegister' });
 
   const [show, setShow] = useState(false);
@@ -41,19 +46,17 @@ function AddOnRegister({ createdBy }: AddOnRegisterProps): JSX.Element {
   const handleRegister = async () => {
     const { data } = await create({
       variables: {
-        $pluginName: formState.pluginName,
-        $pluginCreatedBy: formState.pluginCreatedBy,
-        $pluginDesc: formState.pluginDesc,
-        $pluginInstallStatus: formState.pluginInstallStatus,
-        $installedOrgs: formState.installedOrgs,
+        pluginName: formState.pluginName,
+        pluginCreatedBy: formState.pluginCreatedBy,
+        pluginDesc: formState.pluginDesc,
+        pluginInstallStatus: formState.pluginInstallStatus,
+        installedOrgs: formState.installedOrgs,
       },
     });
 
-    if (data) {
+    if (data && addOnRefetch) {
+      addOnRefetch();
       toast.success('Plugin Added Successfully');
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     }
   };
   return (

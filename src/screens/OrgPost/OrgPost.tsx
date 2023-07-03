@@ -57,7 +57,7 @@ function OrgPost(): JSX.Element {
     data,
     loading: loading2,
     error: error_post,
-    refetch,
+    refetch: postRefetch,
   } = useQuery(ORGANIZATION_POST_CONNECTION_LIST, {
     variables: { id: currentUrl, title_contains: '', text_contains: '' },
   });
@@ -90,8 +90,8 @@ function OrgPost(): JSX.Element {
       });
       /* istanbul ignore next */
       if (data) {
+        postRefetch();
         toast.success('Congratulations! You have Posted Something.');
-        refetch();
         setPostFormState({
           posttitle: '',
           postinfo: '',
@@ -140,7 +140,7 @@ function OrgPost(): JSX.Element {
       title_contains: showTitle ? value : null,
       text_contains: !showTitle ? value : null,
     };
-    refetch(filterData);
+    postRefetch(filterData);
   };
 
   const debouncedHandleSearch = debounce(handleSearch);
@@ -241,6 +241,7 @@ function OrgPost(): JSX.Element {
                         postAuthor={`${datas.creator.firstName} ${datas.creator.lastName}`}
                         postPhoto={datas.imageUrl}
                         postVideo={datas.videoUrl}
+                        postRefetch={postRefetch}
                       />
                     );
                   }

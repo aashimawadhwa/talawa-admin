@@ -48,7 +48,12 @@ function OrgSettings(): JSX.Element {
 
   const currentUrl = window.location.href.split('=')[1];
 
-  const { data, loading, error } = useQuery(MEMBERSHIP_REQUEST, {
+  const {
+    data,
+    loading,
+    error,
+    refetch: membershipRequestRefetch,
+  } = useQuery(MEMBERSHIP_REQUEST, {
     variables: { id: currentUrl },
   });
 
@@ -183,6 +188,7 @@ function OrgSettings(): JSX.Element {
                           joinDate="12/12/2012"
                           memberImage={defaultImg}
                           email={datas.membershipRequests.user.email}
+                          membershipRequestRefetch={membershipRequestRefetch}
                         />
                       );
                     }

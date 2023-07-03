@@ -61,17 +61,19 @@ function OrganizationEvents(): JSX.Element {
     setEventModalIsOpen(false);
   };
 
-  const { data, loading, error, refetch } = useQuery(
-    ORGANIZATION_EVENT_CONNECTION_LIST,
-    {
-      variables: {
-        organization_id: currentUrl,
-        title_contains: '',
-        description_contains: '',
-        location_contains: '',
-      },
-    }
-  );
+  const {
+    data,
+    loading,
+    error,
+    refetch: eventDataRefetch,
+  } = useQuery(ORGANIZATION_EVENT_CONNECTION_LIST, {
+    variables: {
+      organization_id: currentUrl,
+      title_contains: '',
+      description_contains: '',
+      location_contains: '',
+    },
+  });
 
   const { data: orgData } = useQuery(ORGANIZATIONS_LIST, {
     variables: { id: currentUrl },
@@ -104,8 +106,8 @@ function OrganizationEvents(): JSX.Element {
 
       /* istanbul ignore next */
       if (data) {
+        eventDataRefetch();
         toast.success(t('eventCreated'));
-        refetch();
         setFormState({
           title: '',
           eventdescrip: '',
@@ -167,6 +169,7 @@ function OrganizationEvents(): JSX.Element {
             orgData={orgData}
             userRole={userRole}
             userId={userId}
+            eventDataRefetch={eventDataRefetch}
           />
         </Col>
       </Row>

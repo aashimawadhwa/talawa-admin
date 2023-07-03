@@ -46,9 +46,6 @@ const UserUpdate: React.FC<UserPasswordUpdateProps> = ({ id }): JSX.Element => {
       /* istanbul ignore next */
       if (data) {
         toast.success('Successful updated');
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error) {
       /* istanbul ignore next */

@@ -39,7 +39,11 @@ function OrgUpdate(props: OrgUpdateProps): JSX.Element {
     keyPrefix: 'orgUpdate',
   });
 
-  const { data, loading: loadingdata } = useQuery(ORGANIZATIONS_LIST, {
+  const {
+    data,
+    loading: loadingdata,
+    refetch: orgUpdateRefetch,
+  } = useQuery(ORGANIZATIONS_LIST, {
     variables: { id: currentUrl },
   });
 
@@ -73,8 +77,7 @@ function OrgUpdate(props: OrgUpdateProps): JSX.Element {
       });
       /* istanbul ignore next */
       if (data) {
-        window.location.assign(`/orgdash/id=${props.orgid}`);
-
+        orgUpdateRefetch();
         toast.success(t('successfulUpdated'));
       }
     } catch (error: any) {

@@ -1,8 +1,15 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useMutation } from '@apollo/client';
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-modal';
+import { Event } from 'components/EventCalendar/EventCalendar';
 
 import styles from './EventListCard.module.css';
 import {
@@ -11,6 +18,17 @@ import {
 } from 'GraphQl/Mutations/mutations';
 import { Form } from 'react-bootstrap';
 import { errorHandler } from 'utils/errorHandler';
+
+type eventDataRefetchFn = (
+  variables?:
+    | Partial<{
+        organization_id: string;
+        title_contains: string;
+        description_contains: string;
+        location_contains: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
 
 interface EventListCardProps {
   key: string;
@@ -26,6 +44,7 @@ interface EventListCardProps {
   recurring: boolean;
   isPublic: boolean;
   isRegisterable: boolean;
+  eventDataRefetch?: eventDataRefetchFn;
 }
 function EventListCard(props: EventListCardProps): JSX.Element {
   const { t } = useTranslation('translation', {
@@ -75,13 +94,10 @@ function EventListCard(props: EventListCardProps): JSX.Element {
           id: props.id,
         },
       });
-
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.eventDataRefetch) {
+        props.eventDataRefetch();
         toast.success(t('eventDeleted'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -109,11 +125,9 @@ function EventListCard(props: EventListCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.eventDataRefetch) {
+        props.eventDataRefetch();
         toast.success(t('eventUpdated'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -252,6 +266,7 @@ function EventListCard(props: EventListCardProps): JSX.Element {
                 className="btn btn-success"
                 onClick={DeleteEvent}
                 data-testid="deleteEventBtn"
+                data-dismiss="modal"
               >
                 {t('yes')}
               </button>

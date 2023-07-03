@@ -2,8 +2,20 @@ import EventListCard from 'components/EventListCard/EventListCard';
 import dayjs from 'dayjs';
 import React, { useState, useEffect } from 'react';
 import styles from './EventCalendar.module.css';
+import { ApolloQueryResult } from '@apollo/client';
 
-interface Event {
+type eventDataRefetchFn = (
+  variables?:
+    | Partial<{
+        organization_id: string;
+        title_contains: string;
+        description_contains: string;
+        location_contains: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
+
+export interface Event {
   _id: string;
   title: string;
   description: string;
@@ -24,6 +36,7 @@ interface CalendarProps {
   orgData?: IOrgList;
   userRole?: string;
   userId?: string;
+  eventDataRefetch?: eventDataRefetchFn;
 }
 
 enum Status {
@@ -52,6 +65,7 @@ const Calendar: React.FC<CalendarProps> = ({
   orgData,
   userRole,
   userId,
+  eventDataRefetch,
 }) => {
   const [selectedDate] = useState<Date | null>(null);
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -115,7 +129,7 @@ const Calendar: React.FC<CalendarProps> = ({
   useEffect(() => {
     const data = filterData(eventData, orgData, userRole, userId);
     setEvents(data);
-  }, []);
+  }, [eventData, orgData, userRole, userId]);
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -195,6 +209,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     recurring={datas.recurring}
                     isPublic={datas.isPublic}
                     isRegisterable={datas.isRegisterable}
+                    eventDataRefetch={eventDataRefetch}
                   />
                 );
               })}

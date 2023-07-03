@@ -1,7 +1,7 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useMutation } from '@apollo/client';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 // import { ApolloProvider } from '@apollo/react-hooks';
 
@@ -12,6 +12,17 @@ import { Link } from 'react-router-dom';
 import defaultImg from 'assets/third_image.png';
 import { errorHandler } from 'utils/errorHandler';
 
+type adminRefetchFn = (
+  variables?:
+    | Partial<{
+        firstName_contains: string;
+        lastName_contains: string;
+        orgId: string;
+        admin_for: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
+
 interface OrgPeopleListCardProps {
   key: string;
   id: string;
@@ -19,6 +30,7 @@ interface OrgPeopleListCardProps {
   joinDate: string;
   memberImage: string;
   memberEmail: string;
+  adminRefetch?: adminRefetchFn;
 }
 const currentUrl = window.location.href.split('=')[1];
 
@@ -39,11 +51,9 @@ function OrgAdminListCard(props: OrgPeopleListCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.adminRefetch) {
+        props.adminRefetch();
         toast.success(t('adminRemoved'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -127,6 +137,7 @@ function OrgAdminListCard(props: OrgPeopleListCardProps): JSX.Element {
               <button
                 type="button"
                 className="btn btn-success"
+                data-dismiss="modal"
                 onClick={RemoveAdmin}
                 data-testid="removeAdminBtn"
               >

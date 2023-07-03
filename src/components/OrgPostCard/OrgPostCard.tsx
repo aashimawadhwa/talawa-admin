@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 
 import styles from './OrgPostCard.module.css';
@@ -11,6 +11,16 @@ import { useTranslation } from 'react-i18next';
 import defaultImg from 'assets/third_image.png';
 import { errorHandler } from 'utils/errorHandler';
 
+type postRefetchFn = (
+  variables?:
+    | Partial<{
+        id: string;
+        title_contains: string;
+        text_contains: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
+
 interface OrgPostCardProps {
   key: string;
   id: string;
@@ -19,6 +29,7 @@ interface OrgPostCardProps {
   postAuthor: string;
   postPhoto: string;
   postVideo: string;
+  postRefetch?: postRefetchFn;
 }
 
 function OrgPostCard(props: OrgPostCardProps): JSX.Element {
@@ -60,11 +71,9 @@ function OrgPostCard(props: OrgPostCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.postRefetch) {
+        props.postRefetch();
         toast.success(t('postDeleted'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -93,11 +102,9 @@ function OrgPostCard(props: OrgPostCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.postRefetch) {
+        props.postRefetch();
         toast.success(t('postUpdated'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -230,6 +237,7 @@ function OrgPostCard(props: OrgPostCardProps): JSX.Element {
                 type="button"
                 className="btn btn-success"
                 onClick={DeletePost}
+                data-dismiss="modal"
                 data-testid="deletePostBtn"
               >
                 {t('yes')}

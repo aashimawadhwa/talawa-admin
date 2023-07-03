@@ -2,13 +2,22 @@ import React from 'react';
 import styles from './OrgPeopleListCard.module.css';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useMutation } from '@apollo/client';
+import { ApolloQueryResult, useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { REMOVE_MEMBER_MUTATION } from 'GraphQl/Mutations/mutations';
 import { Link } from 'react-router-dom';
 import defaultImg from 'assets/third_image.png';
 import { errorHandler } from 'utils/errorHandler';
+
+type membersRefetchFn = (
+  variables?:
+    | Partial<{
+        firstName_contains: string;
+        lastName_contains: string;
+      }>
+    | undefined
+) => Promise<ApolloQueryResult<any>>;
 
 interface OrgPeopleListCardProps {
   key: string;
@@ -17,6 +26,7 @@ interface OrgPeopleListCardProps {
   joinDate: string;
   memberImage: string;
   memberEmail: string;
+  membersRefetch?: membersRefetchFn;
 }
 
 function OrgPeopleListCard(props: OrgPeopleListCardProps): JSX.Element {
@@ -37,11 +47,9 @@ function OrgPeopleListCard(props: OrgPeopleListCardProps): JSX.Element {
       });
 
       /* istanbul ignore next */
-      if (data) {
+      if (data && props.membersRefetch) {
+        props.membersRefetch();
         toast.success(t('memberRemoved'));
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error: any) {
       /* istanbul ignore next */
@@ -128,6 +136,7 @@ function OrgPeopleListCard(props: OrgPeopleListCardProps): JSX.Element {
                 className="btn btn-success"
                 onClick={RemoveMember}
                 data-testid="removeMemberBtn"
+                data-dismiss="modal"
               >
                 {t('yes')}
               </button>
